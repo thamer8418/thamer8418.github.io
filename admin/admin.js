@@ -683,6 +683,11 @@
   try {
     var saved = JSON.parse(localStorage.getItem(CFG_KEY) || sessionStorage.getItem(CFG_KEY) || "null");
     if (saved && saved.token) {
+      // المستودع غيّر اسمه ليصبح الرابط مختصرًا
+      if (saved.owner === "thamer8418" && saved.repo === "thamer-portfolio") {
+        saved.repo = "thamer8418.github.io";
+        try { (localStorage.getItem(CFG_KEY) ? localStorage : sessionStorage).setItem(CFG_KEY, JSON.stringify(saved)); } catch (e2) {}
+      }
       var f = $("[data-connect-form]");
       f.owner.value = saved.owner; f.repo.value = saved.repo; f.branch.value = saved.branch;
       start(saved);

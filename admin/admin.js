@@ -53,7 +53,7 @@
         return r.text().then(function (t) {
           var msg = "خطأ من GitHub (" + r.status + ")";
           if (r.status === 401) msg = "رمز الوصول غير صحيح أو منتهي الصلاحية.";
-          else if (r.status === 403) msg = "رمز الوصول لا يملك صلاحية الكتابة على هذا المستودع.";
+          else if (r.status === 403) msg = "رمز الوصول لا يملك صلاحية الكتابة. عدّل الرمز في GitHub واجعل Contents على Read and write، ثم اضغط «حفظ ونشر» مرة أخرى.";
           else if (r.status === 404) msg = "لم يُعثر على المستودع أو الملف. تأكد من الاسم والفرع وصلاحيات الرمز.";
           else if (r.status === 409 || r.status === 422) msg = "تعارض في المستودع — حدّث الصفحة وحاول مرة أخرى.";
           var e = new Error(msg); e.status = r.status; e.detail = t; throw e;

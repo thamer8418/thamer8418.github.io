@@ -7,7 +7,7 @@
 | الصفحة | الملف | من يراها |
 |---|---|---|
 | الرئيسية (الأعمال) | `index.html` | الجميع. تعرض مختارات من أعمالك، وبطاقات الأقسام. |
-| القسم | `section.html?id=weddings` | من يملك كلمة مرور هذا القسم فقط. |
+| القسم | `thamer8418.github.io/weddings` | من يملك كلمة مرور هذا القسم فقط. |
 | للحجز والتواصل | `contact.html` | الجميع. |
 | لوحة التحكم | `admin/` | أنت فقط، عن طريق رمز وصول GitHub. |
 
@@ -15,7 +15,12 @@
 - لكل قسم صفحة مستقلة وكلمة مرور خاصة به.
 - كلمة مرور الزواجات تفتح الزواجات فقط، ولا تفتح المعارض أو غيرها.
 - صفحة القسم لا تحتوي على أي رابط للأقسام الأخرى.
-- أرسل للعميل رابط قسمه وكلمة مروره فقط.
+- أرسل للعميل رابط قسمه وكلمة مروره فقط. الروابط مختصرة:
+  - thamer8418.github.io/weddings
+  - thamer8418.github.io/events
+  - thamer8418.github.io/portraits
+  - thamer8418.github.io/real-estate
+- عند إضافة قسم جديد من اللوحة يحصل تلقائيًا على رابط مختصر بنفس اسم الرابط الذي تختاره.
 
 ```
 thamer-portfolio/
@@ -34,20 +39,20 @@ thamer-portfolio/
 ## ١. النشر على GitHub Pages (مرة واحدة)
 
 1. أنشئ حسابًا على github.com إن لم يكن لديك حساب.
-2. أنشئ مستودعًا جديدًا (New repository) باسم مثل `thamer-portfolio`، واجعله **Public**. الحساب المجاني لا يدعم Pages إلا مع المستودعات العامة.
+2. الموقع منشور في المستودع `thamer8418/thamer8418.github.io`. تسمية المستودع بهذا الشكل تجعل عنوان الموقع قصيرًا: **https://thamer8418.github.io**. المستودع **Public** لأن الحساب المجاني لا يدعم Pages إلا مع المستودعات العامة.
 3. ارفع **محتويات** هذا المجلد بحيث يكون `index.html` في أعلى المستودع. يمكنك السحب والإفلات في صفحة «Add file ← Upload files».
 4. افتح **Settings ← Pages**، واختر **Deploy from a branch**، ثم الفرع `main` والمجلد `/ (root)`، واضغط Save.
-5. بعد دقيقة أو دقيقتين يصبح الموقع على: `https://اسم-المستخدم.github.io/thamer-portfolio/`
+5. بعد دقيقة أو دقيقتين يظهر أي تحديث على: `https://thamer8418.github.io`
 6. اختياري: لاستخدام نطاق خاص مثل `thameralharbi.com`، أضفه في Settings ← Pages، واتبع إعدادات DNS التي يعرضها GitHub، ثم فعّل **Enforce HTTPS**.
 
 ## ٢. لوحة التحكم: إضافة الصور وحذفها وتعديل النصوص
 
-افتح `https://موقعك/admin/`.
+افتح `https://thamer8418.github.io/admin/`، واكتب: اسم المستخدم `thamer8418`، والمستودع `thamer8418.github.io`، والفرع `main`.
 
 **أول مرة فقط: احصل على رمز وصول (Token)**
 1. افتح github.com/settings/personal-access-tokens/new
 2. اكتب اسمًا مثل «لوحة الموقع» واختر مدة الصلاحية.
-3. في **Repository access** اختر **Only select repositories**، ثم مستودع الموقع فقط.
+3. في **Repository access** اختر **Only select repositories**، ثم المستودع `thamer8418.github.io` فقط.
 4. في **Permissions ← Repository permissions** اجعل **Contents** على **Read and write**.
 5. اضغط **Generate token**، وانسخ الرمز والصقه في اللوحة مع اسم المستخدم واسم المستودع.
 

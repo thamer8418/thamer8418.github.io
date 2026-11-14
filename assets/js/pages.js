@@ -32,7 +32,7 @@
       var a = document.createElement("a");
       a.className = "section-card reveal";
       a.style.setProperty("--d", (i * 0.08) + "s");
-      a.href = "section.html?id=" + encodeURIComponent(s.id);
+      a.href = encodeURIComponent(s.id) + "/";
       a.innerHTML =
         '<div class="cover"></div>' +
         '<div class="meta"><h3></h3><span class="sub"></span></div>' +
@@ -55,7 +55,9 @@
 
   /* ── صفحة القسم ───────────────────────────────────────────────────────── */
   function section(data) {
-    var id = new URLSearchParams(location.search).get("id");
+    // الرابط المختصر: موقعك/weddings  ←  أو الرابط الكامل: section.html?id=weddings
+    var id = new URLSearchParams(location.search).get("id") ||
+      decodeURIComponent(location.pathname.replace(/\/index\.html$/, "").replace(/\/+$/, "").split("/").pop());
     var s = data.sections.filter(function (x) { return x.id === id; })[0];
     if (!s) {
       $("main").innerHTML = '<p class="empty-note">هذا القسم غير موجود. <a href="index.html" style="text-decoration:underline">العودة للرئيسية</a></p>';

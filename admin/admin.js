@@ -19,6 +19,13 @@
   var tab = "photos";
   var filter = "all";
   var busy = false;
+  var shortLinkOwners = {};    // الأقسام التي لها صفحة رابط مختصر منشورة
+  var RESERVED = ["assets", "data", "admin", "index", "section", "contact"];
+
+  function shortLinkPage(html) {
+    return html.replace("<head>", '<head>\n  <base href="../">').replace(/  <a class="skip-link"[^\n]*\n/, "");
+  }
+  function siteBase() { return new URL("../", location.href).href; }
 
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
@@ -102,20 +109,34 @@
       .then(function (ref) { refSha = ref.object.sha; return gh("/git/commits/" + refSha); })
       .then(function (commit) {
         baseTree = commit.tree.sha;
-        return delPaths.length ? gh("/git/trees/" + baseTree + "?recursive=1") : { tree: [] };
+        return Promise.all([
+          gh("/git/trees/" + baseTree + "?recursive=1"),
+          gh("/contents/section.html?ref=" + encodeURIComponent(cfg.branch), { raw: true })
+        ]);
       })
-      .then(function (tree) {
+      .then(function (res) {
+        var tree = res[0], sectionHtml = res[1];
         var existing = {};
         (tree.tree || []).forEach(function (t) { existing[t.path] = true; });
+        // صفحات الروابط المختصرة: موقعك/<اسم-القسم>/
+        var ids = data.sections.map(function (s) { return s.id; });
+        Object.keys(shortLinkOwners).forEach(function (id) {
+          var p = id + "/index.html";
+          if (ids.indexOf(id) < 0 && existing[p]) delPaths.push(p);
+        });
         delPaths.forEach(function (p) { if (existing[p]) entries.push({ path: p, mode: "100644", type: "blob", sha: null }); });
+        var stub = shortLinkPage(sectionHtml);
+        ids.forEach(function (id) { files.push({ path: id + "/index.html", text: stub }); });
         // رفع الصور واحدة تلو الأخرى
         var chain = Promise.resolve(), done = 0;
         files.forEach(function (f) {
           chain = chain.then(function () {
-            paintStatus("رفع الصور " + ar(++done) + " / " + ar(files.length) + "…");
-            return blobToBase64(f.blob).then(function (b64) {
-              return gh("/git/blobs", { method: "POST", body: { content: b64, encoding: "base64" } });
-            }).then(function (b) { entries.push({ path: f.path, mode: "100644", type: "blob", sha: b.sha }); });
+            paintStatus("رفع الملفات " + ar(++done) + " / " + ar(files.length) + "…");
+            return (f.text != null
+              ? gh("/git/blobs", { method: "POST", body: { content: f.text, encoding: "utf-8" } })
+              : blobToBase64(f.blob).then(function (b64) {
+                  return gh("/git/blobs", { method: "POST", body: { content: b64, encoding: "base64" } });
+                })).then(function (b) { entries.push({ path: f.path, mode: "100644", type: "blob", sha: b.sha }); });
           });
         });
         return chain;
@@ -136,6 +157,7 @@
       })
       .then(function () {
         original = serialize(); uploads = {}; deletes = {};
+        shortLinkOwners = {}; data.sections.forEach(function (s) { shortLinkOwners[s.id] = true; });
         busy = false; paintStatus();
         toast("تم النشر ✓ — يظهر التحديث على الموقع خلال دقيقة تقريبًا.");
       })
@@ -341,7 +363,7 @@
       '<div class="cards">';
     data.sections.forEach(function (s, i) {
       var n = photosIn(s.id).length;
-      var link = new URL("../section.html?id=" + encodeURIComponent(s.id), location.href).href;
+      var link = siteBase() + encodeURIComponent(s.id);
       html +=
         '<div class="card" data-sid="' + esc(s.id) + '">' +
         '<div class="head"><h3>' + esc(s.title || "قسم بدون اسم") + '</h3><span class="muted small">' + ar(n) + " صورة</span></div>" +
@@ -609,6 +631,7 @@
     if (!title) { toast("اكتب اسم القسم.", true); return; }
     if (!id) { toast("اكتب اسم الرابط بحروف إنجليزية، مثل drone.", true); return; }
     if (sectionById(id)) { toast("يوجد قسم بنفس اسم الرابط.", true); return; }
+    if (RESERVED.indexOf(id) > -1) { toast("هذا الاسم محجوز، اختر اسمًا آخر للرابط.", true); return; }
     (pw ? sha256(pw) : Promise.resolve("")).then(function (h) {
       data.sections.push({ id: id, title: title, description: "", cover: "", locked: !!h, passwordHash: h });
       changed(); render();
@@ -627,6 +650,7 @@
       d.settings = d.settings || {}; d.texts = d.texts || {}; d.contact = d.contact || {};
       d.sections = d.sections || []; d.photos = d.photos || [];
       data = d; original = serialize();
+      shortLinkOwners = {}; d.sections.forEach(function (s) { shortLinkOwners[s.id] = true; });
       $("[data-view-connect]").hidden = true;
       $("[data-view-app]").hidden = false;
       $("[data-repo-label]").textContent = cfg.local ? "وضع التجربة — لا يُحفظ شيء على الموقع" : cfg.owner + "/" + cfg.repo + " · " + cfg.branch;

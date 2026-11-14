@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>لوحة التحكم — ثامر الحربي</title>
+  <link rel="icon" type="image/png" href="../assets/logo/favicon-48.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="admin.css">
+  <script>try{var t=localStorage.getItem("ta-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body class="admin">
+
+  <!-- ── الاتصال ───────────────────────────────────────────────────────── -->
+  <section class="connect" data-view-connect>
+    <div class="connect-card">
+      <span class="logo-mark" aria-hidden="true"></span>
+      <p class="eyebrow">لوحة التحكم</p>
+      <h1>إدارة الموقع</h1>
+      <p class="muted">اربط حساب GitHub الذي يستضيف الموقع. كل تعديل تحفظه يُنشر على الموقع خلال دقيقة تقريبًا.</p>
+
+      <form class="form" data-connect-form>
+        <label>اسم المستخدم في GitHub<input name="owner" required autocomplete="username" dir="ltr" placeholder="your-username"></label>
+        <label>اسم المستودع<input name="repo" required dir="ltr" placeholder="thamer-portfolio"></label>
+        <label>الفرع<input name="branch" required dir="ltr" value="main"></label>
+        <label>رمز الوصول (Token)<input name="token" type="password" required dir="ltr" autocomplete="off" placeholder="github_pat_…"></label>
+        <label class="check"><input type="checkbox" name="remember" checked> تذكّرني على هذا الجهاز</label>
+        <button class="btn" type="submit">اتصال</button>
+        <p class="form-error" data-connect-error role="alert"></p>
+      </form>
+
+      <details class="help">
+        <summary>كيف أحصل على رمز الوصول؟</summary>
+        <ol>
+          <li>افتح <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a></li>
+          <li>اكتب اسمًا مثل «لوحة الموقع» واختر مدة الصلاحية.</li>
+          <li>في <b>Repository access</b> اختر <b>Only select repositories</b> ثم مستودع الموقع فقط.</li>
+          <li>في <b>Permissions → Repository permissions</b> اجعل <b>Contents</b> على <b>Read and write</b>.</li>
+          <li>اضغط <b>Generate token</b> وانسخ الرمز والصقه هنا.</li>
+        </ol>
+        <p class="muted">الرمز يُحفظ في متصفحك فقط ولا يُرسل لأي جهة غير GitHub. لا تشاركه مع أحد.</p>
+      </details>
+
+      <button class="link-btn" type="button" data-local-mode>تجربة اللوحة بدون GitHub (لا يُحفظ شيء)</button>
+    </div>
+  </section>
+
+  <!-- ── اللوحة ─────────────────────────────────────────────────────────── -->
+  <div class="app" data-view-app hidden>
+    <header class="topbar">
+      <div class="topbar-start">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <div>
+          <strong>لوحة التحكم</strong>
+          <span class="muted small" data-repo-label></span>
+        </div>
+      </div>
+      <div class="topbar-end">
+        <span class="status" data-status aria-live="polite"></span>
+        <a class="btn ghost" href="../index.html" target="_blank" rel="noopener">عرض الموقع</a>
+        <button class="btn" type="button" data-save disabled>حفظ ونشر</button>
+        <button class="link-btn" type="button" data-logout>خروج</button>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="photos" aria-selected="true">الصور</button>
+      <button role="tab" data-tab="sections" aria-selected="false">الأقسام وكلمات المرور</button>
+      <button role="tab" data-tab="texts" aria-selected="false">النصوص والتواصل</button>
+      <button role="tab" data-tab="settings" aria-selected="false">الإعدادات</button>
+    </nav>
+
+    <main class="panel" data-panel></main>
+  </div>
+
+  <div class="toast" data-toast role="status" aria-live="polite"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

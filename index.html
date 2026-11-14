@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <title>ثامر الحربي — مصوّر فوتوغرافي</title>
+  <meta name="description" content="أعمال المصوّر ثامر الحربي في الرياض: حفلات الزواج، والمعارض والفعاليات، والبورتريه، والعقارات.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ar_SA">
+  <meta property="og:title" content="ثامر الحربي — مصوّر فوتوغرافي">
+  <meta property="og:description" content="حفلات الزواج، والمعارض والفعاليات، والبورتريه، والعقارات.">
+  <meta property="og:image" content="assets/images/wedding/w01-1600.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121211">
+  <meta name="color-scheme" content="dark light">
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/logo/favicon-48.png">
+  <link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png">
+  <link rel="preload" href="assets/fonts/thmanyahserifdisplay-Light.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/thmanyahserifdisplay-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>
+    /* يضبط الوضع الفاتح/الداكن قبل ظهور الصفحة لتفادي الوميض */
+    (function () {
+      var d = document.documentElement, t = null, def = null;
+      try { t = localStorage.getItem("ta-theme"); def = localStorage.getItem("ta-default-theme"); } catch (e) {}
+      if (t !== "light" && t !== "dark") {
+        t = def || "dark";
+        if (t === "system") t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      }
+      d.setAttribute("data-theme", t);
+      d.classList.add("is-loading");
+    })();
+  </script>
+</head>
+<body class="page-home">
+  <a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
+  <header class="site-header">
+    <nav class="nav" aria-label="القائمة الرئيسية">
+      <a href="index.html" aria-current="page">الأعمال</a>
+      <a href="contact.html">للحجز</a>
+    </nav>
+    <a class="brand" href="index.html" aria-label="ثامر الحربي — الرئيسية"><span class="logo-mark"></span></a>
+    <div class="header-end">
+      <button class="theme-toggle" type="button" data-theme-toggle><span class="dot" aria-hidden="true"></span><span class="label">فاتح</span></button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="intro" aria-labelledby="home-title">
+      <div>
+        <p class="eyebrow reveal" data-text="homeEyebrow">مصوّر فوتوغرافي — الرياض</p>
+        <h1 class="intro-title reveal" id="home-title" style="--d:.08s" data-text="homeTitle">ثامر الحربي</h1>
+      </div>
+      <div class="reveal" style="--d:.2s">
+        <p class="intro-lede" data-text="homeIntro"></p>
+      </div>
+    </section>
+
+    <div class="block-head">
+      <h2 data-text="selectedTitle">مختارات</h2>
+      <p data-selected-count></p>
+    </div>
+    <section class="gallery" data-gallery aria-label="مختارات من الأعمال"></section>
+
+    <div data-sections-block>
+      <div class="block-gap"></div>
+      <div class="block-head">
+        <h2 data-text="sectionsTitle">الأقسام</h2>
+        <p data-text="sectionsIntro"></p>
+      </div>
+      <div class="sections-grid" data-sections></div>
+    </div>
+    <noscript><p class="empty-note">فعّل JavaScript لعرض المعرض.</p></noscript>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span data-year>٢٠٢٦</span> ثامر الحربي</span>
+    <span class="tagline" data-text="footerTagline">يوم الفرح يستاهل توثيقه بكل احترافية</span>
+    <nav class="end" aria-label="روابط التذييل">
+      <a href="index.html">الأعمال</a>
+      <a href="contact.html">للحجز</a>
+    </nav>
+  </footer>
+  <script src="assets/js/site.js"></script>
+  <script src="assets/js/lightbox.js"></script>
+  <script src="assets/js/gallery.js"></script>
+  <script src="assets/js/pages.js"></script>
+</body>
+</html>

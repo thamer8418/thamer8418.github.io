@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <title>للحجز والتواصل — ثامر الحربي</title>
+  <meta name="description" content="للحجز والتواصل مع المصوّر ثامر الحربي في الرياض: البريد الإلكتروني، واتساب، وإنستقرام.">
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="للحجز والتواصل — ثامر الحربي">
+  <meta property="og:image" content="assets/images/wedding/w16-1600.jpg">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121211">
+  <meta name="color-scheme" content="dark light">
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/logo/favicon-48.png">
+  <link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png">
+  <link rel="preload" href="assets/fonts/thmanyahserifdisplay-Light.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/thmanyahserifdisplay-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>
+    /* يضبط الوضع الفاتح/الداكن قبل ظهور الصفحة لتفادي الوميض */
+    (function () {
+      var d = document.documentElement, t = null, def = null;
+      try { t = localStorage.getItem("ta-theme"); def = localStorage.getItem("ta-default-theme"); } catch (e) {}
+      if (t !== "light" && t !== "dark") {
+        t = def || "dark";
+        if (t === "system") t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      }
+      d.setAttribute("data-theme", t);
+      d.classList.add("is-loading");
+    })();
+  </script>
+</head>
+<body class="page-contact">
+  <a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
+  <header class="site-header">
+    <nav class="nav" aria-label="القائمة الرئيسية">
+      <a href="index.html">الأعمال</a>
+      <a href="contact.html" aria-current="page">للحجز</a>
+    </nav>
+    <a class="brand" href="index.html" aria-label="ثامر الحربي — الرئيسية"><span class="logo-mark"></span></a>
+    <div class="header-end">
+      <button class="theme-toggle" type="button" data-theme-toggle><span class="dot" aria-hidden="true"></span><span class="label">فاتح</span></button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="contact" aria-labelledby="contact-title">
+      <div class="contact-body">
+        <p class="eyebrow reveal" data-text="contactEyebrow">للحجز والتواصل</p>
+        <h1 class="contact-title reveal" id="contact-title" style="--d:.08s" data-text="homeTitle">ثامر الحربي</h1>
+        <p class="contact-role reveal" style="--d:.14s" data-text="contactRole">مصوّر فوتوغرافي محترف</p>
+        <p class="contact-intro reveal" style="--d:.2s" data-text="contactIntro"></p>
+        <ul class="channels reveal" data-channels style="--d:.28s"></ul>
+        <a class="back-link" href="index.html"><span aria-hidden="true">→</span> العودة إلى الأعمال</a>
+      </div>
+      <figure class="contact-figure">
+        <img src="assets/images/wedding/w16-1600.jpg"
+             srcset="assets/images/wedding/w16-800.webp 800w, assets/images/wedding/w16-1600.webp 1600w, assets/images/wedding/w16-2400.webp 2400w"
+             sizes="(max-width: 760px) 100vw, 48vw" width="1600" height="2000" loading="lazy" decoding="async"
+             alt="صورة قريبة للعريس المبتسم بالغترة البيضاء">
+        <figcaption>ابتسامة العريس</figcaption>
+      </figure>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>© <span data-year>٢٠٢٦</span> ثامر الحربي</span>
+    <span class="tagline" data-text="footerTagline">يوم الفرح يستاهل توثيقه بكل احترافية</span>
+    <nav class="end" aria-label="روابط التذييل">
+      <a href="index.html">الأعمال</a>
+      <a href="contact.html">للحجز</a>
+    </nav>
+  </footer>
+  <script src="assets/js/site.js"></script>
+  <script src="assets/js/pages.js"></script>
+</body>
+</html>

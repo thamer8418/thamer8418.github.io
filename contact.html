@@ -15,6 +15,7 @@
   <link rel="preload" href="assets/fonts/thmanyahserifdisplay-Light.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/thmanyahserifdisplay-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/motion.css">
   <script>
     /* يضبط الوضع الفاتح/الداكن قبل ظهور الصفحة لتفادي الوميض */
     (function () {
@@ -26,10 +27,23 @@
       }
       d.setAttribute("data-theme", t);
       d.classList.add("is-loading");
+      /* أول زيارة: شاشة الافتتاح. بعدها: ستارة سريعة بين الصفحات */
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        var seen = null; try { seen = sessionStorage.getItem("ta-seen"); } catch (e) {}
+        d.classList.add(seen ? "via-curtain" : "first-visit");
+      }
     })();
   </script>
 </head>
 <body class="page-contact">
+  <!-- شاشة الافتتاح (أول زيارة) وستارة الانتقال بين الصفحات -->
+  <div class="loader" aria-hidden="true">
+    <div class="loader-inner">
+      <span class="logo-mark"></span>
+      <div class="loader-line"><span>ثامر الحربي</span><span class="loader-bar"><i></i></span><span class="loader-count">٠</span></div>
+    </div>
+  </div>
+  <div class="curtain" aria-hidden="true"><span class="logo-mark"></span></div>
   <a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
   <header class="site-header">
     <nav class="nav" aria-label="القائمة الرئيسية">
@@ -45,14 +59,14 @@
   <main id="main">
     <section class="contact" aria-labelledby="contact-title">
       <div class="contact-body">
-        <p class="eyebrow reveal" data-text="contactEyebrow">للحجز والتواصل</p>
-        <h1 class="contact-title reveal" id="contact-title" style="--d:.08s" data-text="homeTitle">ثامر الحربي</h1>
-        <p class="contact-role reveal" style="--d:.14s" data-text="contactRole">مصوّر فوتوغرافي محترف</p>
-        <p class="contact-intro reveal" style="--d:.2s" data-text="contactIntro"></p>
-        <ul class="channels reveal" data-channels style="--d:.28s"></ul>
+        <p class="chapter-num" data-reveal data-text="contactEyebrow">للحجز والتواصل</p>
+        <h1 class="contact-title" id="contact-title" data-split data-text="homeTitle">ثامر الحربي</h1>
+        <p class="contact-role" data-reveal style="--rd:300ms" data-text="contactRole">مصوّر فوتوغرافي محترف</p>
+        <p class="contact-intro" data-reveal style="--rd:420ms" data-text="contactIntro"></p>
+        <ul class="channels" data-channels data-reveal style="--rd:540ms"></ul>
         <a class="back-link" href="index.html"><span aria-hidden="true">→</span> العودة إلى الأعمال</a>
       </div>
-      <figure class="contact-figure">
+      <figure class="contact-figure" data-parallax="0.12">
         <img src="assets/images/wedding/w16-1600.jpg"
              srcset="assets/images/wedding/w16-800.webp 800w, assets/images/wedding/w16-1600.webp 1600w, assets/images/wedding/w16-2400.webp 2400w"
              sizes="(max-width: 760px) 100vw, 48vw" width="1600" height="2000" loading="lazy" decoding="async"
@@ -70,6 +84,7 @@
       <a href="contact.html">للحجز</a>
     </nav>
   </footer>
+  <script src="assets/js/motion.js"></script>
   <script src="assets/js/site.js"></script>
   <script src="assets/js/pages.js"></script>
 </body>

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-theme="dark">
+<html lang="ar" dir="rtl" data-theme="dark" class="has-hero">
 <head>
   <base href="../">
   <title>قسم — ثامر الحربي</title>
@@ -13,6 +13,7 @@
   <link rel="preload" href="assets/fonts/thmanyahserifdisplay-Light.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/thmanyahserifdisplay-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/motion.css">
   <script>
     /* يضبط الوضع الفاتح/الداكن قبل ظهور الصفحة لتفادي الوميض */
     (function () {
@@ -24,10 +25,23 @@
       }
       d.setAttribute("data-theme", t);
       d.classList.add("is-loading");
+      /* أول زيارة: شاشة الافتتاح. بعدها: ستارة سريعة بين الصفحات */
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        var seen = null; try { seen = sessionStorage.getItem("ta-seen"); } catch (e) {}
+        d.classList.add(seen ? "via-curtain" : "first-visit");
+      }
     })();
   </script>
 </head>
 <body class="page-section">
+  <!-- شاشة الافتتاح (أول زيارة) وستارة الانتقال بين الصفحات -->
+  <div class="loader" aria-hidden="true">
+    <div class="loader-inner">
+      <span class="logo-mark"></span>
+      <div class="loader-line"><span>ثامر الحربي</span><span class="loader-bar"><i></i></span><span class="loader-count">٠</span></div>
+    </div>
+  </div>
+  <div class="curtain" aria-hidden="true"><span class="logo-mark"></span></div>
   <header class="site-header">
     <nav class="nav" aria-label="القائمة الرئيسية">
       <a href="index.html">الأعمال</a>
@@ -42,20 +56,24 @@
   <!-- صفحة واحدة لكل الأقسام: section.html?id=weddings
        لا تحتوي على روابط للأقسام الأخرى. -->
   <main id="main">
-    <section class="intro" aria-labelledby="section-title">
-      <div>
-        <p class="eyebrow reveal">قسم</p>
-        <h1 class="intro-title reveal" id="section-title" style="--d:.08s" data-section-title></h1>
+    <section class="hero" data-hero aria-labelledby="section-title">
+      <div class="hero-media"><img data-hero-img alt=""></div>
+      <div class="hero-shade"></div>
+      <div class="hero-index"><span>قسم</span><span data-section-count></span></div>
+      <div class="hero-content">
+        <h1 class="hero-title" id="section-title" data-section-title></h1>
+        <div class="hero-row"><p class="hero-lede" data-section-desc data-reveal style="--rd:500ms"></p></div>
       </div>
-      <div class="reveal" style="--d:.2s">
-        <p class="intro-lede" data-section-desc></p>
-        <p class="intro-meta" data-section-count></p>
-      </div>
+      <div class="hero-scroll" aria-hidden="true"><span>مرّر للاستكشاف</span><i></i></div>
     </section>
-    <div class="block-head" style="border-top:1px solid var(--line)"></div>
+    <div style="height:clamp(60px,8vw,120px)"></div>
     <section class="gallery" data-gallery aria-label="صور القسم"></section>
   </main>
 
+  <section class="footer-cta">
+    <p data-reveal>لديك مناسبة قادمة؟</p>
+    <a class="big" href="contact.html" data-cursor="تواصل"><span data-split>لنحكِ قصّتك</span> <span class="arr" aria-hidden="true">↖</span></a>
+  </section>
   <footer class="site-footer">
     <span>© <span data-year>٢٠٢٦</span> ثامر الحربي</span>
     <span class="tagline" data-text="footerTagline">يوم الفرح يستاهل توثيقه بكل احترافية</span>
@@ -64,6 +82,7 @@
       <a href="contact.html">للحجز</a>
     </nav>
   </footer>
+  <script src="assets/js/motion.js"></script>
   <script src="assets/js/site.js"></script>
   <script src="assets/js/lightbox.js"></script>
   <script src="assets/js/gallery.js"></script>

@@ -42,12 +42,18 @@
   }
 
   var io = "IntersectionObserver" in window ? new IntersectionObserver(function (entries) {
-    entries.filter(function (e) { return e.isIntersecting; }).forEach(function (e, k) {
-      var el = e.target;
-      el.style.transitionDelay = Math.min(k * 70, 420) + "ms";
-      el.classList.add("is-in");
-      setTimeout(function () { el.style.transitionDelay = ""; }, 1600);
-      io.unobserve(el);
+    // نراقب الصف (الصور نفسها مخفية بالقص فلا يراها المراقب) ثم تظهر صوره بالتتابع
+    entries.filter(function (e) { return e.isIntersecting; }).forEach(function (e) {
+      var row = e.target;
+      var show = function () {
+        Array.prototype.forEach.call(row.querySelectorAll(".tile"), function (el, k) {
+          el.style.transitionDelay = Math.min(k * 110, 440) + "ms";
+          el.classList.add("is-in");
+          setTimeout(function () { el.style.transitionDelay = ""; }, 2200);
+        });
+      };
+      if (window.Motion) Motion.onStart(show); else show();
+      io.unobserve(row);
     });
   }, { rootMargin: "0px 0px -6% 0px", threshold: 0.01 }) : null;
 
@@ -101,7 +107,9 @@
       });
       el.appendChild(frag);
       el.querySelectorAll("img").forEach(function (img) { if (img.complete && img.naturalWidth) img.classList.add("is-loaded"); });
-      el.querySelectorAll(".tile").forEach(function (t) { if (io) io.observe(t); else t.classList.add("is-in"); });
+      el.querySelectorAll(".gallery-row").forEach(function (r) {
+        if (io) io.observe(r); else r.querySelectorAll(".tile").forEach(function (t) { t.classList.add("is-in"); });
+      });
     }
 
     el.addEventListener("click", function (e) {

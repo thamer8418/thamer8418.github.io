@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-theme="dark">
+<html lang="ar" dir="rtl" data-theme="dark" class="has-hero">
 <head>
   <title>ثامر الحربي — مصوّر فوتوغرافي</title>
   <meta name="description" content="أعمال المصوّر ثامر الحربي في الرياض: حفلات الزواج، والمعارض والفعاليات، والبورتريه، والعقارات.">
@@ -18,6 +18,7 @@
   <link rel="preload" href="assets/fonts/thmanyahserifdisplay-Light.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/thmanyahserifdisplay-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/motion.css">
   <script>
     /* يضبط الوضع الفاتح/الداكن قبل ظهور الصفحة لتفادي الوميض */
     (function () {
@@ -29,10 +30,23 @@
       }
       d.setAttribute("data-theme", t);
       d.classList.add("is-loading");
+      /* أول زيارة: شاشة الافتتاح. بعدها: ستارة سريعة بين الصفحات */
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        var seen = null; try { seen = sessionStorage.getItem("ta-seen"); } catch (e) {}
+        d.classList.add(seen ? "via-curtain" : "first-visit");
+      }
     })();
   </script>
 </head>
 <body class="page-home">
+  <!-- شاشة الافتتاح (أول زيارة) وستارة الانتقال بين الصفحات -->
+  <div class="loader" aria-hidden="true">
+    <div class="loader-inner">
+      <span class="logo-mark"></span>
+      <div class="loader-line"><span>ثامر الحربي</span><span class="loader-bar"><i></i></span><span class="loader-count">٠</span></div>
+    </div>
+  </div>
+  <div class="curtain" aria-hidden="true"><span class="logo-mark"></span></div>
   <a class="skip-link" href="#main">تخطَّ إلى المحتوى</a>
   <header class="site-header">
     <nav class="nav" aria-label="القائمة الرئيسية">
@@ -46,33 +60,42 @@
   </header>
 
   <main id="main">
-    <section class="intro" aria-labelledby="home-title">
-      <div>
-        <p class="eyebrow reveal" data-text="homeEyebrow">مصوّر فوتوغرافي — الرياض</p>
-        <h1 class="intro-title reveal" id="home-title" style="--d:.08s" data-text="homeTitle">ثامر الحربي</h1>
+    <!-- الواجهة بملء الشاشة — الصورة تُختار من لوحة التحكم (الإعدادات) -->
+    <section class="hero" data-hero aria-labelledby="home-title">
+      <div class="hero-media"><img data-hero-img alt="" fetchpriority="high"></div>
+      <div class="hero-shade"></div>
+      <div class="hero-index"><span data-text="homeEyebrow">مصوّر فوتوغرافي — الرياض</span><span data-hero-caption></span></div>
+      <div class="hero-content">
+        <h1 class="hero-title" id="home-title" data-text="homeTitle">ثامر الحربي</h1>
+        <div class="hero-row">
+          <p class="hero-lede" data-text="homeIntro" data-reveal style="--rd:500ms"></p>
+        </div>
       </div>
-      <div class="reveal" style="--d:.2s">
-        <p class="intro-lede" data-text="homeIntro"></p>
-      </div>
+      <div class="hero-scroll" aria-hidden="true"><span>مرّر للاستكشاف</span><i></i></div>
     </section>
 
-    <div class="block-head">
-      <h2 data-text="selectedTitle">مختارات</h2>
-      <p data-selected-count></p>
-    </div>
+    <header class="chapter">
+      <div class="chapter-top"><span class="chapter-num" data-reveal>٠١</span><span class="chapter-meta" data-selected-count data-reveal></span></div>
+      <h2 class="chapter-title" data-text="selectedTitle">مختارات</h2>
+    </header>
     <section class="gallery" data-gallery aria-label="مختارات من الأعمال"></section>
 
+    <div class="marquee" aria-hidden="true"><div class="marquee-track" data-marquee></div></div>
+
     <div data-sections-block>
-      <div class="block-gap"></div>
-      <div class="block-head">
-        <h2 data-text="sectionsTitle">الأقسام</h2>
-        <p data-text="sectionsIntro"></p>
-      </div>
+      <header class="chapter">
+        <div class="chapter-top"><span class="chapter-num" data-reveal>٠٢</span><span class="chapter-meta" data-text="sectionsIntro" data-reveal></span></div>
+        <h2 class="chapter-title" data-text="sectionsTitle">الأقسام</h2>
+      </header>
       <div class="sections-grid" data-sections></div>
     </div>
     <noscript><p class="empty-note">فعّل JavaScript لعرض المعرض.</p></noscript>
   </main>
 
+  <section class="footer-cta">
+    <p data-reveal>لديك مناسبة قادمة؟</p>
+    <a class="big" href="contact.html" data-cursor="تواصل"><span data-split>لنحكِ قصّتك</span> <span class="arr" aria-hidden="true">↖</span></a>
+  </section>
   <footer class="site-footer">
     <span>© <span data-year>٢٠٢٦</span> ثامر الحربي</span>
     <span class="tagline" data-text="footerTagline">يوم الفرح يستاهل توثيقه بكل احترافية</span>
@@ -81,6 +104,7 @@
       <a href="contact.html">للحجز</a>
     </nav>
   </footer>
+  <script src="assets/js/motion.js"></script>
   <script src="assets/js/site.js"></script>
   <script src="assets/js/lightbox.js"></script>
   <script src="assets/js/gallery.js"></script>

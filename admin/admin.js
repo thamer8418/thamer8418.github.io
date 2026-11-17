@@ -442,6 +442,11 @@
       '<option value="session"' + (st.rememberUnlock !== "device" ? " selected" : "") + ">حتى إغلاق المتصفح</option>" +
       '<option value="device"' + (st.rememberUnlock === "device" ? " selected" : "") + ">دائمًا على نفس الجهاز</option></select></label></div>" +
       '<div class="card"><h3>المظهر</h3>' +
+      '<label class="field">صورة الواجهة في الرئيسية (تظهر بملء الشاشة)<select data-st="heroPhoto">' +
+      data.photos.map(function (p) {
+        return '<option value="' + esc(p.id) + '"' + (p.id === st.heroPhoto ? " selected" : "") + ">" + esc((sectionById(p.section) || {}).title || "") + " — " + esc(p.title || "بدون عنوان") + "</option>";
+      }).join("") + "</select></label>" +
+      '<p class="hint">اختر صورة أفقية قوية؛ تُقصّ لتملأ الشاشة.</p>' +
       '<label class="field">الوضع عند أول زيارة<select data-st="defaultTheme">' +
       [["dark", "داكن"], ["light", "فاتح"], ["system", "حسب جهاز الزائر"]].map(function (o) {
         return '<option value="' + o[0] + '"' + ((st.defaultTheme || "dark") === o[0] ? " selected" : "") + ">" + o[1] + "</option>";

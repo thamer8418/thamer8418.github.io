@@ -104,7 +104,6 @@ html.is-loading main { visibility: hidden; }
   padding-inline: var(--gutter);
   border-bottom: 1px solid transparent;
   transition: height .5s var(--ease), background-color .5s var(--ease), border-color .5s var(--ease);
-  view-transition-name: site-header;
 }
 .site-header.is-compact {
   height: var(--header-h-compact);
@@ -307,11 +306,6 @@ html.is-locked main, html.is-locked .site-footer { visibility: hidden; }
 @keyframes settle { from { transform: scale(1.06); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
 html:not(.is-loading) .reveal { animation: fadeUp 1.2s var(--ease-out) both; animation-delay: var(--d, 0s); }
-@view-transition { navigation: auto; }
-::view-transition-old(root) { animation: .35s var(--ease) both vtOut; }
-::view-transition-new(root) { animation: .6s var(--ease-out) both vtIn; }
-@keyframes vtOut { to { opacity: 0; } }
-@keyframes vtIn { from { opacity: 0; transform: translateY(10px); } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
   .tile { opacity: 1; transform: none; }

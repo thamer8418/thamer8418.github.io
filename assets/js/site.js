@@ -215,27 +215,11 @@
     root.classList.remove("is-loading");
   }
 
-  /* ── تلاشي الانتقال بين الصفحات للمتصفحات القديمة ───────────────────────── */
-  if (!("onpagereveal" in window) && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    document.addEventListener("click", function (e) {
-      var a = e.target.closest("a[href]");
-      if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-      if (a.target === "_blank" || a.hasAttribute("download") || a.closest(".gallery")) return;
-      var url = new URL(a.href, location.href);
-      if (url.origin !== location.origin || (url.pathname === location.pathname && url.search === location.search)) return;
-      e.preventDefault();
-      document.body.style.transition = "opacity .3s ease";
-      document.body.style.opacity = "0";
-      setTimeout(function () { location.href = url.href; }, 280);
-    });
-    addEventListener("pageshow", function () { document.body.style.opacity = ""; });
-  }
-
   document.querySelectorAll("[data-year]").forEach(function (el) { el.textContent = ar(new Date().getFullYear()); });
   paintToggles();
 
   window.Site = {
-    ready: ready, show: show, requirePassword: requirePassword, sha256: sha256,
+    ready: ready, loaded: dataPromise, show: show, requirePassword: requirePassword, sha256: sha256,
     sources: sources, ar: ar, pad: pad, photoWord: photoWord
   };
 })();

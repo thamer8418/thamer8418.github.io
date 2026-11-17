@@ -5,7 +5,7 @@
   "rememberUnlock": "session",
   "defaultTheme": "system",
   "heroPhoto": "w02",
-  "contactPhoto": "pmwkmhxn5ta06",
+  "contactPhoto": "pmwkmixffrfaz",
   "nameFont": "sans",
   "kashida": true,
   "kashidaLength": 2
@@ -806,11 +806,28 @@
    "home": false,
    "feature": false,
    "color": "#ffffff"
+  },
+  {
+   "id": "pmwkmixffrfaz",
+   "section": "_site",
+   "file": "site/pmwkmixffrfaz",
+   "w": 1398,
+   "h": 1125,
+   "widths": [
+    800,
+    1398
+   ],
+   "fmt": "jpg",
+   "title": "صورة صفحة التواصل",
+   "alt": "",
+   "home": false,
+   "feature": false,
+   "color": "#000000"
   }
  ],
  "share": {
   "home": "w02",
-  "contact": "pmwkmhxn5ta06",
+  "contact": "pmwkmixffrfaz",
   "weddings": "w16",
   "events": "e01",
   "portraits": "p03",

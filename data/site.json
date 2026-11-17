@@ -5,7 +5,7 @@
   "rememberUnlock": "session",
   "defaultTheme": "system",
   "heroPhoto": "w02",
-  "contactPhoto": "pmwkmjwuafact",
+  "contactPhoto": "pmwkmm1c4z69d",
   "nameFont": "sans",
   "kashida": true,
   "kashidaLength": 2
@@ -840,11 +840,98 @@
    "home": false,
    "feature": false,
    "color": "#000000"
+  },
+  {
+   "id": "pmwkmkzlzuk3o",
+   "section": "_site",
+   "file": "site/pmwkmkzlzuk3o",
+   "w": 1254,
+   "h": 1254,
+   "widths": [
+    800,
+    1254
+   ],
+   "fmt": "jpg",
+   "title": "صورة صفحة التواصل",
+   "alt": "",
+   "home": false,
+   "feature": false,
+   "color": "#aaaaaa"
+  },
+  {
+   "id": "pmwkml5ie361r",
+   "section": "_site",
+   "file": "site/pmwkml5ie361r",
+   "w": 4194,
+   "h": 3375,
+   "widths": [
+    800,
+    1600,
+    2400
+   ],
+   "fmt": "jpg",
+   "title": "صورة صفحة التواصل",
+   "alt": "",
+   "home": false,
+   "feature": false,
+   "color": "#ffffff"
+  },
+  {
+   "id": "pmwkml8tua35r",
+   "section": "_site",
+   "file": "site/pmwkml8tua35r",
+   "w": 1398,
+   "h": 1125,
+   "widths": [
+    800,
+    1398
+   ],
+   "fmt": "jpg",
+   "title": "صورة صفحة التواصل",
+   "alt": "",
+   "home": false,
+   "feature": false,
+   "color": "#000000"
+  },
+  {
+   "id": "pmwkmlcraf5vj",
+   "section": "_site",
+   "file": "site/pmwkmlcraf5vj",
+   "w": 1254,
+   "h": 1254,
+   "widths": [
+    800,
+    1254
+   ],
+   "fmt": "jpg",
+   "title": "صورة صفحة التواصل",
+   "alt": "",
+   "home": false,
+   "feature": false,
+   "color": "#aaaaaa"
+  },
+  {
+   "id": "pmwkmm1c4z69d",
+   "section": "_site",
+   "file": "site/pmwkmm1c4z69d",
+   "w": 4194,
+   "h": 3375,
+   "widths": [
+    800,
+    1600,
+    2400
+   ],
+   "fmt": "jpg",
+   "title": "صورة صفحة التواصل",
+   "alt": "",
+   "home": false,
+   "feature": false,
+   "color": "#ffffff"
   }
  ],
  "share": {
   "home": "w02",
-  "contact": "pmwkmjwuafact",
+  "contact": "pmwkmm1c4z69d",
   "weddings": "w16",
   "events": "e01",
   "portraits": "p03",

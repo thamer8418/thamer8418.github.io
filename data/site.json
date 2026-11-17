@@ -5,7 +5,7 @@
   "rememberUnlock": "session",
   "defaultTheme": "system",
   "heroPhoto": "w02",
-  "contactPhoto": "pmwkmgrlv8aye",
+  "contactPhoto": "pmwkmhxn5ta06",
   "nameFont": "sans",
   "kashida": true,
   "kashidaLength": 2
@@ -26,7 +26,7 @@
   "scrollHint": "مرّر للاستكشاف",
   "footerCtaLead": "لديك مناسبة قادمة؟",
   "footerCtaTitle": "لنحكِ قصّتك",
-  "contactPhotoCaption": "ابتسامة العريس",
+  "contactPhotoCaption": "",
   "gateText": "هذا القسم خاص بأصحابه. أدخل كلمة المرور التي وصلتك للدخول."
  },
  "contact": {
@@ -788,11 +788,29 @@
    "home": false,
    "feature": false,
    "color": "#ffffff"
+  },
+  {
+   "id": "pmwkmhxn5ta06",
+   "section": "_site",
+   "file": "site/pmwkmhxn5ta06",
+   "w": 4194,
+   "h": 3375,
+   "widths": [
+    800,
+    1600,
+    2400
+   ],
+   "fmt": "jpg",
+   "title": "صورة صفحة التواصل",
+   "alt": "",
+   "home": false,
+   "feature": false,
+   "color": "#ffffff"
   }
  ],
  "share": {
   "home": "w02",
-  "contact": "pmwkmgrlv8aye",
+  "contact": "pmwkmhxn5ta06",
   "weddings": "w16",
   "events": "e01",
   "portraits": "p03",

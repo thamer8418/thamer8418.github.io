@@ -20,6 +20,7 @@
   var filter = "all";
   var busy = false;
   var shortLinkOwners = {};    // الأقسام التي لها صفحة رابط مختصر منشورة
+  var SITE_ONLY = "_site";        // صور الواجهة/التواصل التي لا تظهر في أي قسم
   var RESERVED = ["assets", "data", "admin", "index", "section", "contact", "share"];
 
   /* ── المشاركة في وسائل التواصل: وسوم og لكل صفحة ─────────────────────── */
@@ -310,7 +311,7 @@
       if (W < WIDTHS[WIDTHS.length - 1]) widths.push(W);
       widths = widths.filter(function (v, i, a) { return a.indexOf(v) === i; }).sort(function (a, b) { return a - b; });
       var id = "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-      var folder = "assets/images/" + sectionId + "/";
+      var folder = "assets/images/" + (sectionId === SITE_ONLY ? "site" : sectionId) + "/";
       var out = [], chain = Promise.resolve();
       widths.forEach(function (w) {
         chain = chain.then(function () {
@@ -328,7 +329,7 @@
         uploads[id] = out.map(function (o) { return { path: o.path, blob: o.blob }; });
         var title = file.name.replace(/\.[^.]+$/, "");
         return {
-          id: id, section: sectionId, file: sectionId + "/" + id, w: W, h: H,
+          id: id, section: sectionId, file: (sectionId === SITE_ONLY ? "site" : sectionId) + "/" + id, w: W, h: H,
           widths: widths, fmt: "jpg", title: "", alt: "", home: false, feature: false, color: color, _name: title
         };
       });
@@ -388,7 +389,7 @@
       '<option value="home"' + (selected === "home" ? " selected" : "") + '>مختارات الرئيسية</option>' : "";
     return o + data.sections.map(function (s) {
       return '<option value="' + esc(s.id) + '"' + (s.id === selected ? " selected" : "") + ">" + esc(s.title) + "</option>";
-    }).join("");
+    }).join("") + '<option value="' + SITE_ONLY + '"' + (selected === SITE_ONLY ? " selected" : "") + ">صور الموقع فقط (الواجهة والتواصل — لا تظهر في المعرض)</option>";
   }
 
   function viewPhotos() {
@@ -403,7 +404,8 @@
         "<strong>إضافة صور جديدة</strong>" +
         '<div class="toolbar" style="margin:0">' +
         '<label class="field">إلى قسم<select data-upload-section>' + sectionOptions(upSec) + "</select></label>" +
-        '<label class="btn" style="cursor:pointer">اختيار الصور<input type="file" accept="image/*" multiple hidden data-upload-input></label>' +
+        '<label class="btn" style="cursor:pointer">إضافة صورة واحدة<input type="file" accept="image/*" hidden data-upload-input></label>' +
+        '<label class="btn ghost" style="cursor:pointer">إضافة عدة صور<input type="file" accept="image/*" multiple hidden data-upload-input></label>' +
         "</div>" +
         '<p class="hint">' + (cfg.local ? "رفع الصور يحتاج الاتصال بـ GitHub." : "يمكنك أيضًا سحب الصور وإفلاتها هنا. تُصغَّر الصور تلقائيًا لأحجام الويب، والأصل على جهازك لا يتغيّر. صدّر من Lightroom بأعلى جودة (JPEG).") + "</p>" +
         '<p class="progress" data-upload-progress></p></div>';
@@ -418,7 +420,6 @@
         (uploads[p.id] ? '<span class="flag">جديدة</span>' : "") + "</div>" +
         '<div class="body">' +
         '<label class="field">العنوان<input data-f="title" value="' + esc(p.title) + '" placeholder="' + esc(p._name ? "مثال: لحظة الوصول" : "") + '"></label>' +
-        '<label class="field">وصف الصورة (لمحركات البحث وقارئات الشاشة)<textarea data-f="alt" rows="2">' + esc(p.alt) + "</textarea></label>" +
         '<label class="field">القسم<select data-f="section">' + sectionOptions(p.section) + "</select></label>" +
         '<div class="row">' +
         '<label class="check"><input type="checkbox" data-f="home"' + (p.home ? " checked" : "") + "> في مختارات الرئيسية</label>" +
@@ -517,6 +518,7 @@
     var cur = data.settings[key], p = photoById(cur);
     return '<div class="field photo-pick">' + label +
       '<div class="pick-row"><img data-preview="' + key + '" alt="" src="' + esc(p ? thumbFor(p) : "") + '"' + (p ? "" : " hidden") + ">" +
+      '<label class="btn small" style="cursor:pointer;flex:none">رفع صورة جديدة<input type="file" accept="image/*" hidden data-pick-upload="' + key + '"></label>' +
       '<select data-st="' + key + '">' +
       data.photos.map(function (q) {
         return '<option value="' + esc(q.id) + '"' + (q.id === cur ? " selected" : "") + ">" +
@@ -656,6 +658,20 @@
     var t = e.target;
     if (t.matches("[data-filter]")) { filter = t.value; render(); return; }
     if (t.matches("[data-upload-input]")) { handleFiles(t.files); t.value = ""; return; }
+    if (t.matches("[data-pick-upload]")) {
+      var pkey = t.getAttribute("data-pick-upload"), pf = t.files[0]; t.value = "";
+      if (!pf) return;
+      if (cfg.local) { toast("رفع الصور يحتاج الاتصال بـ GitHub.", true); return; }
+      toast("جارٍ تجهيز الصورة…");
+      processFile(pf, SITE_ONLY).then(function (np) {
+        np.title = pkey === "heroPhoto" ? "صورة الواجهة" : "صورة صفحة التواصل";
+        data.photos.push(np);
+        data.settings[pkey] = np.id;
+        changed(); render();
+        toast("جاهزة ✓ — اضغط «حفظ ونشر» لتظهر على الموقع.");
+      }, function () { toast("تعذّر قراءة الصورة. جرّب JPEG.", true); });
+      return;
+    }
     if (t.matches("[data-logo-input]")) { if (t.files[0]) handleLogo(t.files[0]); t.value = ""; return; }
 
     var card = t.closest(".pcard");

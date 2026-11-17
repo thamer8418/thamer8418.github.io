@@ -110,7 +110,7 @@ label.check input { width: 17px; height: 17px; accent-color: var(--ink); }
 @media (max-width: 420px) { .photo-grid { grid-template-columns: 1fr; } }
 
 /* اختيار صورة + الشعار */
-.photo-pick .pick-row { display: flex; gap: 12px; align-items: center; }
+.photo-pick .pick-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .photo-pick img { width: 96px; height: 64px; object-fit: cover; background: var(--bg-raised); flex: none; }
 .photo-pick select { flex: 1; }
 .logo-row { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }

@@ -5,7 +5,7 @@
   "rememberUnlock": "session",
   "defaultTheme": "system",
   "heroPhoto": "w02",
-  "contactPhoto": "pmwkmixffrfaz",
+  "contactPhoto": "pmwkmjwuafact",
   "nameFont": "sans",
   "kashida": true,
   "kashidaLength": 2
@@ -823,11 +823,28 @@
    "home": false,
    "feature": false,
    "color": "#000000"
+  },
+  {
+   "id": "pmwkmjwuafact",
+   "section": "_site",
+   "file": "site/pmwkmjwuafact",
+   "w": 1398,
+   "h": 1125,
+   "widths": [
+    800,
+    1398
+   ],
+   "fmt": "jpg",
+   "title": "صورة صفحة التواصل",
+   "alt": "",
+   "home": false,
+   "feature": false,
+   "color": "#000000"
   }
  ],
  "share": {
   "home": "w02",
-  "contact": "pmwkmixffrfaz",
+  "contact": "pmwkmjwuafact",
   "weddings": "w16",
   "events": "e01",
   "portraits": "p03",

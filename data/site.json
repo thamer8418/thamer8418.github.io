@@ -4,7 +4,11 @@
   "passwordHash": "057ba03d6c44104863dc7361fe4578965d1887360f90a0895882e58a6248fc86",
   "rememberUnlock": "session",
   "defaultTheme": "system",
-  "heroPhoto": "w02"
+  "heroPhoto": "w02",
+  "contactPhoto": "w16",
+  "nameFont": "sans",
+  "kashida": true,
+  "kashidaLength": 2
  },
  "texts": {
   "siteTitle": "ثامر الحربي — مصوّر فوتوغرافي",
@@ -18,7 +22,12 @@
   "contactEyebrow": "للحجز والتواصل",
   "contactRole": "مصوّر فوتوغرافي",
   "contactIntro": "أصوّر حفلات الزواج والمعارض والفعاليات والبورتريه والعقارات.. أخبرني عن مناسبتك وتاريخها، وسأعود إليك بالتفاصيل والتوفّر في أقرب وقت.",
-  "footerTagline": "يوم الفرح يستاهل توثيقه بكل احترافية"
+  "footerTagline": "يوم الفرح يستاهل توثيقه بكل احترافية",
+  "scrollHint": "مرّر للاستكشاف",
+  "footerCtaLead": "لديك مناسبة قادمة؟",
+  "footerCtaTitle": "لنحكِ قصّتك",
+  "contactPhotoCaption": "ابتسامة العريس",
+  "gateText": "هذا القسم خاص بأصحابه. أدخل كلمة المرور التي وصلتك للدخول."
  },
  "contact": {
   "email": "thamerphoto@outlook.sa",
@@ -745,5 +754,13 @@
    "feature": false,
    "color": "#cbc2bd"
   }
- ]
+ ],
+ "share": {
+  "home": "w02",
+  "contact": "w16",
+  "weddings": "w16",
+  "events": "e01",
+  "portraits": "p03",
+  "real-estate": "r01"
+ }
 }

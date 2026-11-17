@@ -9,6 +9,12 @@
 @font-face { font-family: "Thmanyah Serif Display"; src: url("../fonts/thmanyahserifdisplay-Medium.woff2") format("woff2");  font-weight: 500; font-display: swap; }
 @font-face { font-family: "Thmanyah Serif Display"; src: url("../fonts/thmanyahserifdisplay-Bold.woff2") format("woff2");    font-weight: 700; font-display: swap; }
 @font-face { font-family: "Thmanyah Serif Display"; src: url("../fonts/thmanyahserifdisplay-Black.woff2") format("woff2");   font-weight: 900; font-display: swap; }
+/* خطوط الاسم الكبير — تُختار من لوحة التحكم (الإعدادات ← خط الاسم) */
+@font-face { font-family: "Thmanyah Sans"; src: url("../fonts/thmanyahsans-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Thmanyah Sans"; src: url("../fonts/thmanyahsans-Bold.woff2") format("woff2");   font-weight: 700; font-display: swap; }
+@font-face { font-family: "Thmanyah Sans"; src: url("../fonts/thmanyahsans-Black.woff2") format("woff2");  font-weight: 900; font-display: swap; }
+@font-face { font-family: "Thmanyah Serif Text"; src: url("../fonts/thmanyahseriftext-Bold.woff2") format("woff2");  font-weight: 700; font-display: swap; }
+@font-face { font-family: "Thmanyah Serif Text"; src: url("../fonts/thmanyahseriftext-Black.woff2") format("woff2"); font-weight: 900; font-display: swap; }
 
 /* 2. ألوان الوضعين -----------------------------------------------------------
    الفاتح: جدار معرض عاجي دافئ. الداكن: صالة عرض سينمائية.                  */
@@ -91,9 +97,9 @@ html.is-loading main { visibility: hidden; }
 .eyebrow { display: inline-flex; align-items: center; gap: 14px; margin: 0; font-size: 15px; color: var(--ink-2); }
 .eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; opacity: .6; }
 .logo-mark {
-  display: block; aspect-ratio: 989 / 1076; background: currentColor;
-  -webkit-mask: url("../logo/logo-600.png") center / contain no-repeat;
-          mask: url("../logo/logo-600.png") center / contain no-repeat;
+  display: block; aspect-ratio: var(--logo-ratio, 989 / 1076); background: currentColor;
+  -webkit-mask: var(--logo-url, url("../logo/logo-600.png")) center / contain no-repeat;
+          mask: var(--logo-url, url("../logo/logo-600.png")) center / contain no-repeat;
 }
 
 /* 5. الترويسة ---------------------------------------------------------------- */

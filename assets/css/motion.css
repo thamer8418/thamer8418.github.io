@@ -150,19 +150,6 @@ html.has-hero main { padding-top: 0; }
 }
 .tile-cap .n { letter-spacing: 0; }
 
-/* ── شريط الكلمات المتحرّك ─────────────────────────────────────────────── */
-.marquee { position: relative; overflow: hidden; padding-block: clamp(40px, 6vw, 90px); border-block: 1px solid var(--line); margin-top: clamp(80px, 10vw, 150px); }
-.marquee-track { display: flex; width: max-content; gap: 0; animation: marquee 38s linear infinite; }
-.marquee-track span {
-  display: inline-flex; align-items: center; gap: clamp(26px, 4vw, 60px); padding-inline: clamp(13px, 2vw, 30px);
-  font-size: clamp(48px, 8vw, 128px); font-weight: 300; line-height: 1.2; white-space: nowrap;
-  color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--ink) 55%, transparent);
-}
-.marquee-track span:nth-child(odd) { color: var(--ink); -webkit-text-stroke: 0; }
-.marquee-track span::after { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); flex: none; }
-@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(50%); } }
-.marquee:hover .marquee-track { animation-play-state: paused; }
-
 /* ── بطاقات الأقسام المرقّمة ─────────────────────────────────────────────── */
 .section-card { position: relative; }
 .section-card .num { position: absolute; top: 16px; right: 16px; z-index: 2; font-size: 15px; color: #f3efe7; text-shadow: 0 1px 12px rgba(0, 0, 0, .4); }
@@ -185,7 +172,7 @@ html.has-hero main { padding-top: 0; }
 /* بلا حركة لمن يفضّل ذلك */
 @media (prefers-reduced-motion: reduce) {
   .split .wi, [data-reveal], .tile, .tile img, .section-card .cover, .section-card .cover img, .rule { transform: none !important; opacity: 1 !important; clip-path: none !important; }
-  .marquee-track, .grain::after { animation: none; }
+  .grain::after { animation: none; }
   .loader, .curtain { display: none !important; }
 }
 
@@ -200,3 +187,17 @@ html.has-hero main { padding-top: 0; }
   .chapter-top { flex-direction: column; gap: 6px; }
   .footer-cta a.big { font-size: clamp(44px, 13vw, 80px); }
 }
+
+/* ── خط الاسم الكبير ───────────────────────────────────────────────────── */
+:root { --font-name: "Thmanyah Sans", var(--font); --name-weight: 700; }
+:root[data-name-font="serif-display"] { --font-name: var(--font); --name-weight: 300; }
+:root[data-name-font="serif-text"] { --font-name: "Thmanyah Serif Text", var(--font); --name-weight: 700; }
+:root[data-name-font="sans-black"] { --font-name: "Thmanyah Sans", var(--font); --name-weight: 900; }
+.hero-title.is-name, .contact-title { font-family: var(--font-name); font-weight: var(--name-weight); line-height: 1.12; }
+
+/* ── الشعار في الواجهة والتذييل ────────────────────────────────────────── */
+.hero-logo { height: clamp(70px, 8vw, 118px); color: #f3efe7; margin-bottom: clamp(14px, 2vw, 26px); opacity: 0; transform: translateY(20px); transition: opacity 1.2s var(--ease-expo) .15s, transform 1.4s var(--ease-expo) .15s; }
+.hero.is-in .hero-logo { opacity: 1; transform: none; }
+.footer-logo { display: block; width: fit-content; margin-bottom: clamp(36px, 5vw, 60px); color: var(--ink); }
+.footer-logo .logo-mark { height: clamp(80px, 9vw, 130px); }
+@media (max-width: 760px) { .hero-logo { height: 64px; } }

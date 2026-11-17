@@ -59,8 +59,6 @@
     Site.show();
     Gallery.mount($("[data-gallery]"), picks);
 
-    M.marquee($(".marquee"), data.sections.map(function (s) { return s.title; }).concat(["ثامر الحربي"]));
-
     var grid = $("[data-sections]");
     if (!data.sections.length) { $("[data-sections-block]").hidden = true; }
     data.sections.forEach(function (s, i) {
@@ -83,7 +81,8 @@
         img.onload = function () { img.classList.add("is-loaded"); };
         c.appendChild(img);
       } else c.innerHTML = '<div class="no-cover"><span class="logo-mark"></span></div>';
-      text(a.querySelector("h3"), s.title);
+      text(a.querySelector("h3"), Site.kashida(s.title));
+      a.querySelector("h3").setAttribute("aria-label", s.title);
       a.querySelector(".sub").innerHTML = (s.locked ? LOCK_SVG + " محمي · " : "") + Site.photoWord(n);
       text(a.querySelector("p"), s.description);
       a.style.transitionDelay = (i % 2) * 120 + "ms";
@@ -114,13 +113,14 @@
       ? Site.requirePassword({
           key: "ta-unlock-sec-" + s.id, hash: s.passwordHash, remember: data.settings.rememberUnlock,
           eyebrow: "قسم خاص", title: s.title, homeLink: true,
-          text: "هذا القسم خاص بأصحابه. أدخل كلمة المرور التي وصلتك للدخول."
+          text: data.texts.gateText || "هذا القسم خاص بأصحابه. أدخل كلمة المرور التي وصلتك للدخول."
         })
       : Promise.resolve();
 
     gate.then(function () {
       var photos = data.photos.filter(function (p) { return p.section === s.id; });
       text($("[data-section-title]"), s.title);
+      Site.applyKashida($("[data-section-title]"));
       text($("[data-section-desc]"), s.description);
       text($("[data-section-count]"), Site.photoWord(photos.length));
       M.split($("[data-section-title]"), 150);
@@ -133,6 +133,13 @@
   /* ── التواصل ─────────────────────────────────────────────────────────── */
   function contact(data) {
     var C = data.contact, list = $("[data-channels]");
+    // صورة صفحة التواصل (تُختار من لوحة التحكم)
+    var cp = byId(data, data.settings.contactPhoto) || byId(data, "w16") || data.photos[0], img = $("[data-contact-img]");
+    if (cp && img) {
+      var cs = Site.sources(cp);
+      if (cs.srcset) img.srcset = cs.srcset;
+      img.src = cs.src; img.alt = cp.alt || cp.title || "";
+    }
     var rows = [
       { key: "email", label: "البريد الإلكتروني", href: function (v) { return "mailto:" + v; }, ltr: true },
       { key: "whatsapp", label: "واتساب", ltr: true, external: true,

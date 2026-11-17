@@ -20,10 +20,54 @@
   var filter = "all";
   var busy = false;
   var shortLinkOwners = {};    // الأقسام التي لها صفحة رابط مختصر منشورة
-  var RESERVED = ["assets", "data", "admin", "index", "section", "contact"];
+  var RESERVED = ["assets", "data", "admin", "index", "section", "contact", "share"];
 
-  function shortLinkPage(html) {
-    return html.replace("<head>", '<head>\n  <base href="../">').replace(/  <a class="skip-link"[^\n]*\n/, "");
+  /* ── المشاركة في وسائل التواصل: وسوم og لكل صفحة ─────────────────────── */
+  var SHARE_A = "<!--share-->", SHARE_B = "<!--/share-->";
+  function shareBlock(o) {
+    var m = function (k, v, name) { return '  <meta ' + (name ? 'name="' : 'property="') + k + '" content="' + esc(v) + '">\n'; };
+    return SHARE_A + "\n" +
+      m("og:type", "website") + m("og:locale", "ar_SA") + m("og:site_name", o.site) +
+      m("og:title", o.title) + m("og:description", o.desc) + m("og:url", o.url) +
+      m("og:image", o.image) + m("og:image:width", "1200") + m("og:image:height", "630") +
+      m("twitter:card", "summary_large_image", 1) + m("twitter:title", o.title, 1) +
+      m("twitter:description", o.desc, 1) + m("twitter:image", o.image, 1) +
+      "  " + SHARE_B;
+  }
+  function withShare(html, o) {
+    var a = html.indexOf(SHARE_A), b = html.indexOf(SHARE_B);
+    if (a < 0 || b < 0) return html;
+    html = html.slice(0, a) + shareBlock(o) + html.slice(b + SHARE_B.length);
+    if (o.pageTitle) html = html.replace(/<title>[^<]*<\/title>/, "<title>" + esc(o.pageTitle) + "</title>");
+    if (o.desc) html = html.replace(/<meta name="description" content="[^"]*">/, '<meta name="description" content="' + esc(o.desc) + '">');
+    return html;
+  }
+  function shortLinkPage(html, sec) {
+    html = html.replace("<head>", '<head>\n  <base href="../">').replace(/  <a class="skip-link"[^\n]*\n/, "");
+    return sec ? withShare(html, sec) : html;
+  }
+  // صورة مشاركة 1200×630 مقصوصة من الصورة المختارة
+  function photoUrl(p) {
+    var up = uploads[p.id];
+    if (up && up.length) return URL.createObjectURL(up[up.length - 1].blob);
+    if (p.src) return "../" + p.src;
+    var ws = p.widths || WIDTHS, jw = ws.indexOf(1600) > -1 ? 1600 : ws[ws.length - 1];
+    return "../assets/images/" + p.file + "-" + jw + ".jpg";
+  }
+  function makeShareImage(p) {
+    return new Promise(function (res, rej) {
+      var img = new Image();
+      img.onload = function () {
+        var c = document.createElement("canvas"); c.width = 1200; c.height = 630;
+        var sc = Math.max(1200 / img.naturalWidth, 630 / img.naturalHeight);
+        var w = img.naturalWidth * sc, h = img.naturalHeight * sc;
+        var g = c.getContext("2d"); g.imageSmoothingQuality = "high";
+        g.drawImage(img, (1200 - w) / 2, (630 - h) * 0.35, w, h);
+        c.toBlob(res, "image/jpeg", 0.86);
+      };
+      img.onerror = rej;
+      img.src = photoUrl(p);
+    });
   }
   function siteBase() { return new URL("../", location.href).href; }
 
@@ -109,15 +153,44 @@
       .then(function (ref) { refSha = ref.object.sha; return gh("/git/commits/" + refSha); })
       .then(function (commit) {
         baseTree = commit.tree.sha;
-        return Promise.all([
-          gh("/git/trees/" + baseTree + "?recursive=1"),
-          gh("/contents/section.html?ref=" + encodeURIComponent(cfg.branch), { raw: true })
-        ]);
+        var raw = function (p) { return gh("/contents/" + p + "?ref=" + encodeURIComponent(cfg.branch), { raw: true }); };
+        return Promise.all([gh("/git/trees/" + baseTree + "?recursive=1"), raw("section.html"), raw("index.html"), raw("contact.html")]);
       })
       .then(function (res) {
-        var tree = res[0], sectionHtml = res[1];
+        var tree = res[0], sectionHtml = res[1], indexHtml = res[2], contactHtml = res[3];
         var existing = {};
         (tree.tree || []).forEach(function (t) { existing[t.path] = true; });
+
+        // صور المشاركة: تُصنع فقط عند تغيّر الصورة المختارة
+        var T = data.texts, base = siteBase(), name = T.homeTitle || "ثامر الحربي";
+        data.share = data.share || {};
+        var targets = [{ key: "home", photo: photoById(data.settings.heroPhoto) }, { key: "contact", photo: photoById(data.settings.contactPhoto) }];
+        data.sections.forEach(function (s) {
+          targets.push({ key: s.id, photo: photoById(s.cover) || photosIn(s.id)[0] });
+        });
+        var imgOf = {};
+        var shareChain = Promise.resolve();
+        targets.forEach(function (tg) {
+          if (!tg.photo) return;
+          var path = "assets/share/" + tg.key + ".jpg";
+          imgOf[tg.key] = base + path + "?v=" + encodeURIComponent(tg.photo.id);
+          if (data.share[tg.key] === tg.photo.id && existing[path]) return;
+          shareChain = shareChain.then(function () {
+            paintStatus("تجهيز صور المشاركة…");
+            return makeShareImage(tg.photo).then(function (blob) {
+              files.push({ path: path, blob: blob });
+              data.share[tg.key] = tg.photo.id;
+            }, function () {});
+          });
+        });
+        return shareChain.then(function () {
+          files.push({ path: "index.html", text: withShare(indexHtml, { site: name, title: T.siteTitle || name, desc: T.siteDescription || "", url: base, image: imgOf.home || "", pageTitle: T.siteTitle || name }) });
+          files.push({ path: "contact.html", text: withShare(contactHtml, { site: name, title: "للحجز والتواصل — " + name, desc: T.contactIntro || T.siteDescription || "", url: base + "contact.html", image: imgOf.contact || imgOf.home || "", pageTitle: "للحجز والتواصل — " + name }) });
+          return [tree, sectionHtml, existing, imgOf, name];
+        });
+      })
+      .then(function (res) {
+        var sectionHtml = res[1], existing = res[2], imgOf = res[3], name = res[4], base = siteBase();
         // صفحات الروابط المختصرة: موقعك/<اسم-القسم>/
         var ids = data.sections.map(function (s) { return s.id; });
         Object.keys(shortLinkOwners).forEach(function (id) {
@@ -125,8 +198,13 @@
           if (ids.indexOf(id) < 0 && existing[p]) delPaths.push(p);
         });
         delPaths.forEach(function (p) { if (existing[p]) entries.push({ path: p, mode: "100644", type: "blob", sha: null }); });
-        var stub = shortLinkPage(sectionHtml);
-        ids.forEach(function (id) { files.push({ path: id + "/index.html", text: stub }); });
+        data.sections.forEach(function (sec) {
+          files.push({ path: sec.id + "/index.html", text: shortLinkPage(sectionHtml, {
+            site: name, title: sec.title + " — " + name, pageTitle: sec.title + " — " + name,
+            desc: sec.description || data.texts.siteDescription || "", url: base + sec.id + "/",
+            image: imgOf[sec.id] || imgOf.home || ""
+          }) });
+        });
         // رفع الصور واحدة تلو الأخرى
         var chain = Promise.resolve(), done = 0;
         files.forEach(function (f) {
@@ -394,17 +472,37 @@
     return html;
   }
 
-  var TEXT_FIELDS = [
-    ["homeEyebrow", "سطر صغير فوق الاسم (الرئيسية)"],
-    ["homeTitle", "الاسم الكبير"],
-    ["homeIntro", "النبذة في الرئيسية", true],
-    ["selectedTitle", "عنوان المختارات"],
-    ["sectionsTitle", "عنوان الأقسام"],
-    ["sectionsIntro", "سطر تحت عنوان الأقسام"],
-    ["contactEyebrow", "سطر صغير في صفحة التواصل"],
-    ["contactRole", "المسمّى المهني"],
-    ["contactIntro", "النبذة في صفحة التواصل", true],
-    ["footerTagline", "عبارة التذييل"]
+  // كل ما يظهر في الموقع من نصوص وصور، مجمّعًا حسب الصفحة
+  var CONTENT = [
+    { title: "الرئيسية", items: [
+      ["photo", "heroPhoto", "صورة الواجهة بملء الشاشة (يُفضّل صورة أفقية)"],
+      ["text", "homeEyebrow", "سطر صغير أعلى الواجهة"],
+      ["text", "homeTitle", "الاسم الكبير"],
+      ["area", "homeIntro", "النبذة تحت الاسم"],
+      ["text", "scrollHint", "عبارة «مرّر للاستكشاف»"],
+      ["text", "selectedTitle", "عنوان المختارات"],
+      ["text", "sectionsTitle", "عنوان الأقسام"],
+      ["text", "sectionsIntro", "سطر بجانب عنوان الأقسام"]
+    ] },
+    { title: "صفحة للحجز والتواصل", items: [
+      ["photo", "contactPhoto", "صورة صفحة التواصل"],
+      ["text", "contactPhotoCaption", "تعليق تحت الصورة"],
+      ["text", "contactEyebrow", "سطر صغير أعلى الصفحة"],
+      ["text", "contactRole", "المسمّى المهني"],
+      ["area", "contactIntro", "النبذة"]
+    ] },
+    { title: "أسفل كل الصفحات", items: [
+      ["text", "footerCtaLead", "السطر الصغير قبل الدعوة"],
+      ["text", "footerCtaTitle", "الدعوة الكبيرة (رابط للحجز)"],
+      ["text", "footerTagline", "عبارة التذييل"]
+    ] },
+    { title: "شاشة كلمة المرور للأقسام", items: [
+      ["area", "gateText", "النص الذي يظهر للزائر"]
+    ] },
+    { title: "عند المشاركة ومحركات البحث", items: [
+      ["text", "siteTitle", "عنوان الموقع"],
+      ["area", "siteDescription", "وصف الموقع (يظهر تحت الرابط عند المشاركة)"]
+    ], hint: "صورة المشاركة لكل صفحة تُصنع تلقائيًا عند الحفظ: الرئيسية من صورة الواجهة، وكل قسم من صورة غلافه، وصفحة التواصل من صورتها." }
   ];
   var CONTACT_FIELDS = [
     ["email", "البريد الإلكتروني", "ltr"],
@@ -414,15 +512,32 @@
     ["instagram", "حساب إنستقرام (بدون @)", "ltr"],
     ["city", "المدينة"]
   ];
+  function photoById(id) { return data.photos.filter(function (p) { return p.id === id; })[0]; }
+  function photoPicker(key, label) {
+    var cur = data.settings[key], p = photoById(cur);
+    return '<div class="field photo-pick">' + label +
+      '<div class="pick-row"><img data-preview="' + key + '" alt="" src="' + esc(p ? thumbFor(p) : "") + '"' + (p ? "" : " hidden") + ">" +
+      '<select data-st="' + key + '">' +
+      data.photos.map(function (q) {
+        return '<option value="' + esc(q.id) + '"' + (q.id === cur ? " selected" : "") + ">" +
+          esc((sectionById(q.section) || {}).title || "") + " — " + esc(q.title || "بدون عنوان") + "</option>";
+      }).join("") + "</select></div></div>";
+  }
   function viewTexts() {
-    var html = '<div class="cards"><div class="card"><h3>نصوص الموقع</h3>';
-    TEXT_FIELDS.forEach(function (f) {
-      var v = data.texts[f[0]] || "";
-      html += '<label class="field">' + f[1] + (f[2]
-        ? '<textarea data-t="' + f[0] + '" rows="3">' + esc(v) + "</textarea>"
-        : '<input data-t="' + f[0] + '" value="' + esc(v) + '">') + "</label>";
+    var html = '<p class="notice">كل نص وكل صورة في الموقع من هنا. صور المعرض نفسها وعناوينها في تبويب «الصور»، وأسماء الأقسام وأغلفتها في «الأقسام».</p><div class="cards">';
+    CONTENT.forEach(function (g) {
+      html += '<div class="card"><h3>' + g.title + "</h3>";
+      if (g.hint) html += '<p class="hint">' + g.hint + "</p>";
+      g.items.forEach(function (f) {
+        if (f[0] === "photo") { html += photoPicker(f[1], f[2]); return; }
+        var v = data.texts[f[1]] || "";
+        html += '<label class="field">' + f[2] + (f[0] === "area"
+          ? '<textarea data-t="' + f[1] + '" rows="3">' + esc(v) + "</textarea>"
+          : '<input data-t="' + f[1] + '" value="' + esc(v) + '">') + "</label>";
+      });
+      html += "</div>";
     });
-    html += '</div><div class="card"><h3>بيانات التواصل</h3><p class="hint">اترك الحقل فارغًا لإخفائه من صفحة التواصل.</p>';
+    html += '<div class="card"><h3>بيانات التواصل</h3><p class="hint">اترك الحقل فارغًا لإخفائه من صفحة التواصل.</p>';
     CONTACT_FIELDS.forEach(function (f) {
       html += '<label class="field">' + f[1] + '<input data-c="' + f[0] + '" value="' + esc(data.contact[f[0]] || "") + '"' + (f[2] ? ' dir="ltr"' : "") + "></label>";
     });
@@ -441,12 +556,21 @@
       '<label class="field">تذكّر الدخول<select data-st="rememberUnlock">' +
       '<option value="session"' + (st.rememberUnlock !== "device" ? " selected" : "") + ">حتى إغلاق المتصفح</option>" +
       '<option value="device"' + (st.rememberUnlock === "device" ? " selected" : "") + ">دائمًا على نفس الجهاز</option></select></label></div>" +
+      '<div class="card"><h3>الشعار</h3>' +
+      '<div class="logo-row"><span class="logo-mark logo-preview" aria-hidden="true"></span>' +
+      '<label class="btn" style="cursor:pointer">رفع شعار جديد<input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden data-logo-input></label></div>' +
+      '<p class="hint">PNG بخلفية شفافة هو الأفضل. إن كانت الخلفية بيضاء تُزال تلقائيًا. يتلوّن الشعار تلقائيًا مع الوضع الفاتح والداكن، وتُحدَّث أيقونة المتصفح معه.</p>' +
+      '<p class="ok-note" data-logo-note></p></div>' +
       '<div class="card"><h3>المظهر</h3>' +
-      '<label class="field">صورة الواجهة في الرئيسية (تظهر بملء الشاشة)<select data-st="heroPhoto">' +
-      data.photos.map(function (p) {
-        return '<option value="' + esc(p.id) + '"' + (p.id === st.heroPhoto ? " selected" : "") + ">" + esc((sectionById(p.section) || {}).title || "") + " — " + esc(p.title || "بدون عنوان") + "</option>";
+      '<label class="field">خط الاسم الكبير (أعلى الموقع وصفحة التواصل)<select data-st="nameFont">' +
+      [["sans", "ثمانية — Sans عريض"], ["sans-black", "ثمانية — Sans أسود ثقيل"], ["serif-text", "ثمانية — Serif Text"], ["serif-display", "ثمانية — Serif Display (خط الموقع)"]].map(function (o) {
+        return '<option value="' + o[0] + '"' + ((st.nameFont || "sans") === o[0] ? " selected" : "") + ">" + o[1] + "</option>";
       }).join("") + "</select></label>" +
-      '<p class="hint">اختر صورة أفقية قوية؛ تُقصّ لتملأ الشاشة.</p>' +
+      '<label class="check"><input type="checkbox" data-st="kashida"' + (st.kashida !== false ? " checked" : "") + "> الكشيدة في العناوين (ثامــر الحربــي)</label>" +
+      '<label class="field">طول الكشيدة<select data-st="kashidaLength">' +
+      [1, 2, 3, 4, 5].map(function (n) {
+        return '<option value="' + n + '"' + ((+st.kashidaLength || 2) === n ? " selected" : "") + ">" + ar(n) + "</option>";
+      }).join("") + "</select></label>" +
       '<label class="field">الوضع عند أول زيارة<select data-st="defaultTheme">' +
       [["dark", "داكن"], ["light", "فاتح"], ["system", "حسب جهاز الزائر"]].map(function (o) {
         return '<option value="' + o[0] + '"' + ((st.defaultTheme || "dark") === o[0] ? " selected" : "") + ">" + o[1] + "</option>";
@@ -532,6 +656,7 @@
     var t = e.target;
     if (t.matches("[data-filter]")) { filter = t.value; render(); return; }
     if (t.matches("[data-upload-input]")) { handleFiles(t.files); t.value = ""; return; }
+    if (t.matches("[data-logo-input]")) { if (t.files[0]) handleLogo(t.files[0]); t.value = ""; return; }
 
     var card = t.closest(".pcard");
     if (card) {
@@ -575,7 +700,13 @@
           changed();
         });
         return;
-      } else data.settings[key] = t.value;
+      } else if (t.type === "checkbox") data.settings[key] = t.checked;
+      else if (key === "kashidaLength") data.settings[key] = +t.value;
+      else {
+        data.settings[key] = t.value;
+        var pv = $('[data-preview="' + key + '"]');
+        if (pv) { var ph = photoById(t.value); if (ph) { pv.src = thumbFor(ph); pv.hidden = false; } }
+      }
       changed();
     }
   });
@@ -627,6 +758,59 @@
       if (failed.length) msg += " تعذّر قراءة: " + failed.join("، ") + " (جرّب تصديرها JPEG).";
       toast(msg, failed.length > 0);
     });
+  }
+
+  /* ── الشعار: يُحوَّل لقالب شفاف + أيقونات المتصفح ───────────────────────── */
+  function handleLogo(file) {
+    if (cfg.local) { toast("رفع الشعار يحتاج الاتصال بـ GitHub.", true); return; }
+    decode(file).then(function (bmp) {
+      var W = bmp.width, H = bmp.height, k = Math.min(1, 1200 / Math.max(W, H));
+      var c = document.createElement("canvas"); c.width = Math.round(W * k); c.height = Math.round(H * k);
+      var x = c.getContext("2d"); x.drawImage(bmp, 0, 0, c.width, c.height);
+      var img = x.getImageData(0, 0, c.width, c.height), d = img.data, transparent = false;
+      for (var i = 3; i < d.length; i += 16) { if (d[i] < 240) { transparent = true; break; } }
+      // بدون شفافية: الأجزاء الداكنة تصبح الشعار، والفاتحة تختفي
+      var minX = c.width, minY = c.height, maxX = 0, maxY = 0;
+      for (var y = 0; y < c.height; y++) for (var xx = 0; xx < c.width; xx++) {
+        var o = (y * c.width + xx) * 4, a;
+        if (transparent) a = d[o + 3];
+        else { var lum = 0.299 * d[o] + 0.587 * d[o + 1] + 0.114 * d[o + 2]; a = Math.max(0, Math.min(255, Math.round((235 - lum) * 255 / 200))); }
+        d[o] = d[o + 1] = d[o + 2] = 0; d[o + 3] = a;
+        if (a > 20) { if (xx < minX) minX = xx; if (xx > maxX) maxX = xx; if (y < minY) minY = y; if (y > maxY) maxY = y; }
+      }
+      x.putImageData(img, 0, 0);
+      if (maxX <= minX || maxY <= minY) throw new Error("empty");
+      var cw = maxX - minX + 1, chh = maxY - minY + 1, s600 = Math.min(1, 600 / chh);
+      var out = document.createElement("canvas"); out.width = Math.round(cw * s600); out.height = Math.round(chh * s600);
+      var ox = out.getContext("2d"); ox.imageSmoothingQuality = "high";
+      ox.drawImage(c, minX, minY, cw, chh, 0, 0, out.width, out.height);
+      function icon(size) {
+        var ic = document.createElement("canvas"); ic.width = ic.height = size;
+        var g = ic.getContext("2d"); g.fillStyle = "#141413"; g.fillRect(0, 0, size, size);
+        var sc = Math.min(size * 0.78 / out.width, size * 0.78 / out.height), w = out.width * sc, h = out.height * sc;
+        var tmp = document.createElement("canvas"); tmp.width = out.width; tmp.height = out.height;
+        var tg = tmp.getContext("2d"); tg.drawImage(out, 0, 0); tg.globalCompositeOperation = "source-in";
+        tg.fillStyle = "#ece8e1"; tg.fillRect(0, 0, tmp.width, tmp.height);
+        g.drawImage(tmp, (size - w) / 2, (size - h) / 2, w, h);
+        return ic;
+      }
+      var png = function (cv) { return new Promise(function (r) { cv.toBlob(r, "image/png"); }); };
+      return Promise.all([png(out), png(icon(48)), png(icon(180)), png(icon(512))]).then(function (b) {
+        uploads.__logo = [
+          { path: "assets/logo/logo-600.png", blob: b[0] },
+          { path: "assets/logo/favicon-48.png", blob: b[1] },
+          { path: "assets/logo/apple-touch-icon.png", blob: b[2] },
+          { path: "assets/logo/icon-512.png", blob: b[3] }
+        ];
+        data.settings.logoRatio = out.width + " / " + out.height;
+        data.settings.logoVersion = String(Date.now());
+        var url = URL.createObjectURL(b[0]);
+        document.documentElement.style.setProperty("--logo-url", 'url("' + url + '")');
+        document.documentElement.style.setProperty("--logo-ratio", data.settings.logoRatio);
+        var n = $("[data-logo-note]"); if (n) n.textContent = "جاهز ✓ — اضغط «حفظ ونشر» لتطبيقه على الموقع.";
+        changed();
+      });
+    }).catch(function () { toast("تعذّر قراءة الشعار. جرّب ملف PNG أو JPG.", true); });
   }
 
   function addSection() {

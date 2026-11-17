@@ -184,8 +184,16 @@
       if (t !== currentTheme()) setTheme(t, false);
     }
 
-    // نصوص مشتركة
+    // المظهر: خط الاسم + الشعار
+    var st = data.settings;
+    root.setAttribute("data-name-font", st.nameFont || "sans");
+    if (st.logoRatio) root.style.setProperty("--logo-ratio", st.logoRatio);
+    if (st.logoVersion) root.style.setProperty("--logo-url", 'url("' + new URL("assets/logo/logo-600.png?v=" + st.logoVersion, document.baseURI).href + '")');
+
+    // نصوص مشتركة ثم الكشيدة في العناوين
     fillTexts(data);
+    KASHIDA = st.kashida === false ? 0 : (+st.kashidaLength || 2);
+    document.querySelectorAll("[data-kashida]").forEach(applyKashida);
 
     // حماية الموقع كاملًا (اختياري)
     if (data.settings.passwordProtection) {
@@ -211,6 +219,34 @@
     });
   }
 
+  /* ── الكشيدة (التطويل) في العناوين ────────────────────────────────────
+     تُضاف بين حرفين متصلين في آخر موضع مناسب من كل كلمة: ثامـــر الحربـــي.
+     النص الأصلي يبقى لقارئات الشاشة ومحركات البحث.                         */
+  var KASHIDA = 2;
+  var DUAL = "بتثجحخسشصضطظعغفقكلمنهيئ";
+  function kashida(text, n) {
+    if (n == null) n = KASHIDA;
+    if (!n || !text) return text;
+    var t = new Array(n + 1).join("ـ");
+    return String(text).split(/(\s+)/).map(function (w) {
+      if (/\s/.test(w) || w.indexOf("ـ") > -1) return w;
+      for (var i = w.length - 2; i >= 1; i--) {
+        var c = w[i], next = w[i + 1];
+        if (DUAL.indexOf(c) < 0 || !/[\u0621-\u064A]/.test(next)) continue;
+        if (c === "ل" && /[اأإآ]/.test(next)) continue;          // لا نكسر «لا»
+        return w.slice(0, i + 1) + t + w.slice(i + 1);
+      }
+      return w;
+    }).join("");
+  }
+  function applyKashida(el) {
+    if (!el || el.getAttribute("data-split-done")) return;
+    var orig = el.getAttribute("data-orig") || el.textContent.trim();
+    el.setAttribute("data-orig", orig);
+    el.setAttribute("aria-label", orig);
+    el.textContent = kashida(orig);
+  }
+
   function show() {
     root.classList.remove("is-loading");
   }
@@ -219,7 +255,7 @@
   paintToggles();
 
   window.Site = {
-    ready: ready, loaded: dataPromise, show: show, requirePassword: requirePassword, sha256: sha256,
+    ready: ready, loaded: dataPromise, show: show, kashida: kashida, applyKashida: applyKashida, requirePassword: requirePassword, sha256: sha256,
     sources: sources, ar: ar, pad: pad, photoWord: photoWord
   };
 })();

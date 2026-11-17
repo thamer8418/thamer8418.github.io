@@ -151,7 +151,7 @@
     if (!el || el.getAttribute("data-split-done")) return;
     var text = el.textContent.trim();
     if (!text) return;
-    el.setAttribute("aria-label", text);
+    el.setAttribute("aria-label", el.getAttribute("aria-label") || text);
     el.textContent = "";
     text.split(/\s+/).forEach(function (word, i, arr) {
       var w = document.createElement("span"); w.className = "w"; w.setAttribute("aria-hidden", "true");
